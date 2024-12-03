@@ -1,0 +1,167 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employees</title>
+    <link rel="icon" href="{% static 'images/blue.jpg' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'css/user_list.css' %}">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    {% include 'navigation_bar.html' %}
+
+    <h1 style="color: #f2f2f2;">Employees List</h1>
+
+    <div class="container" style="background-color: transparent; border-color: transparent;">
+        
+        {% if messages %}
+        <ul class="messages" style="color: #f2f2f2; list-style-type: none;">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        <form method="get" action="{% url 'user_list' %}" class="search">
+            <input type="text" name="q" class="search" placeholder="Search by name..." value="{{ search_query }}">
+            <button type="submit">Search</button>
+        </form>
+
+        <form action="{% url 'remove_employee' %}" method="post">
+            {% csrf_token %}
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Remove</th>
+                        <th>Profile Picture</th>
+                        <th><a href="?sort_by=employeeNumber&sort_order={{ next_sort_order.employeeNumber }}">Employee Number</a></th>
+                        <th><a href="?sort_by=firstName&sort_order={{ next_sort_order.firstName }}">First Name</a></th>
+                        <th><a href="?sort_by=lastName&sort_order={{ next_sort_order.lastName }}">Last Name</a></th>
+                        <th><a href="?sort_by=email&sort_order={{ next_sort_order.email }}">Email</a></th>
+                        <th><a href="?sort_by=birthDate&sort_order={{ next_sort_order.birthDate }}">Birth Date</a></th>
+                        <th><a href="?sort_by=salary&sort_order={{ next_sort_order.salary }}">Salary</a></th>
+                        <th><a href="?sort_by=role&sort_order={{ next_sort_order.role }}">Role</a></th>
+                        <th>Reports To</th>
+                        <th>Edit</th> 
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for employee in employees %}
+                    <tr>
+                        <td><input type="checkbox" name="selected_employees" value="{{ employee.employeeNumber }}"></td>
+                        <td><img src="{{ employee.gravatar_url }}" alt="Avatar" width="50" height="50"></td>
+                        <td>{{ employee.employeeNumber }}</td>
+                        <td>{{ employee.firstName }}</td>
+                        <td>{{ employee.lastName }}</td>
+                        <td>{{ employee.email }}</td>
+                        <td>{{ employee.birthDate }}</td>
+                        <td>{{ employee.salary }}</td>
+                        <td>{{ employee.role }}</td>
+                        <td>{{ employee.reportsTo }}</td>
+                        <td><a href="{% url 'edit_employee' employee.employeeNumber %}">Edit</a></td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td colspan="11">
+                            <button type="submit" style="float: left;">Remove employee(s)</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+
+        <div id="employee-tree" style="margin-top: 20px;">
+            <h1> Organisation’s Hierarchy</h1>
+        </div>
+        <div style="margin-bottom: 10px;">
+            <button id="zoom-in">+</button>
+            <button id="zoom-out">-</button>
+        </div>
+
+    </div>
+    
+
+    <script>
+        function createTree(data) {
+            const margin = { top: 20, right: 200, bottom: 20, left: 200 };
+            const width = 960 - margin.left - margin.right;
+            const height = 500 - margin.top - margin.bottom;
+    
+            const svg = d3.select("#employee-tree").append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+    
+            const treeLayout = d3.tree().size([height, width]);
+    
+            const root = d3.hierarchy(data);
+            treeLayout(root);
+    
+            const link = svg.selectAll(".link")
+                .data(root.descendants().slice(1))
+                .enter().append("path")
+                .attr("class", "link")
+                .attr("d", d => {
+                    return `M${d.y},${d.x}
+                            C${(d.y + d.parent.y) / 2},${d.x}
+                             ${(d.y + d.parent.y) / 2},${d.parent.x}
+                             ${d.parent.y},${d.parent.x}`;
+                })
+                .style("fill", "none")
+                .style("stroke", "#ccc")
+                .style("stroke-width", "2px");
+    
+            const node = svg.selectAll(".node")
+                .data(root.descendants())
+                .enter().append("g")
+                .attr("class", "node")
+                .attr("transform", d => `translate(${d.y},${d.x})`);
+    
+            node.append("circle")
+                .attr("r", 10)
+                .style("fill", "#ec480f")
+                .style("stroke", "steelblue")
+                .style("stroke-width", "3px");
+    
+            node.append("text")
+                .attr("dy", ".35em")
+                .attr("x", d => d.children ? -20 : 20)
+                .style("text-anchor", d => d.children ? "end" : "start")
+                .text(d => d.data.name)
+                .style("font", "bold 18px sans-serif")
+                .style("fill", "#fff");
+
+            const zoom = d3.zoom()
+                .scaleExtent([0.5, 2])
+                .on("zoom", (event) => {
+                    svg.attr("transform", event.transform);
+                });
+
+            svg.call(zoom);
+
+            // Zoom in and out buttons
+            document.getElementById('zoom-in').addEventListener('click', function () {
+                svg.transition().call(zoom.scaleBy, 1.2);
+            });
+
+            document.getElementById('zoom-out').addEventListener('click', function () {
+                svg.transition().call(zoom.scaleBy, 0.8);
+            });
+        }
+        
+
+    
+    // Fetch the hierarchical data from the server
+    fetch("{% url 'get_employee_hierarchy' %}")
+        .then(response => response.json())
+        .then(data => {
+            createTree(data);
+        })
+        .catch(error => console.error("Error fetching employee data:", error));
+    </script>
+</body>
+</html>

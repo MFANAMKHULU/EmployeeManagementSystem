@@ -1,0 +1,52 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration</title>
+    <link rel="stylesheet" href="{% static 'css/user_registration.css' %}">
+    <link rel="icon" href="{% static 'images/blue.jpg' %}" type="image/x-icon">
+</head>
+<body>
+    {% include 'navigation_bar.html' %}
+    <h1 style="color: #fff;">Employee Registration</h1>
+    <form id="employeeForm" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label for="employeeNumber">Employee Number:</label>
+        <input type="text" id="employeeNumber" name="employeeNumber" required>
+        <br>
+        <label for="firstName">First Name:</label>
+        <input type="text" id="firstName" name="firstName" required>
+        <br>
+        <label for="lastName">Last Name:</label>
+        <input type="text" id="lastName" name="lastName" required>
+        <br>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        <br>
+        <label for="birthDate">Birth Date (yyyy-mm-dd):</label>
+        <input type="date" id="birthDate" name="birthDate" required>
+        <br>
+        <label for="salary">Salary:</label>
+        <input type="number" id="salary" name="salary" step="0.01" required>
+        <br>
+        <label for="role">Role:</label>
+        <input type="text" id="role" name="role" required>
+        <br>
+        <label for="reportsTo">Reports To (Employee Number):</label>
+        <input list="employeeNumbers" id="reportsTo" name="reportsTo" placeholder="Choose from the list or leave blank">
+        <datalist id="employeeNumbers">
+            {% for employee in employees %}
+                <option value="{{ employee.employeeNumber }}">{{ employee.firstName }} {{ employee.lastName }}</option>
+            {% endfor %}
+        </datalist>
+        <br>
+        <input type="submit" value="Register">
+        <br>
+        <div id="response-message"></div>
+    </form>
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>

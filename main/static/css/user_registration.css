@@ -1,0 +1,84 @@
+body, html {
+    font-family: 'Helvetica Neue', sans-serif;
+    background-color: #f1e9e9;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    background-image: url("/static/images/sqltest.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+}
+
+h1 {
+    font-size: 28px;
+}
+
+form {
+    background-color: rgba(123, 123, 123, 0.6);
+    border-radius: 8px;
+    padding: 4px;
+    padding-bottom: 10px;
+    padding-top: 10px;
+    width: 60%;
+    margin: 20px auto;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    color: #fff;
+}
+
+input[type="text"],
+input[type="email"],
+input[list],  
+input[type="file"],
+input[type="date"],
+input[type="number"],
+input[type="password"],
+select,
+datalist {
+    width: 60%;            
+    height: 40px;         
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 10px;   
+    box-sizing: border-box; 
+    font-size: 16px;  
+}
+
+input[type="radio"] {
+    margin-right: 5px;
+    vertical-align: middle;
+    margin-bottom: 1px;
+}
+
+label[for="file"] {
+    display: inline-block;
+    background-color: #060606;
+    color: #fff;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+label[for="file"]:hover {
+    background-color: #0056b3;
+}
+
+input[type="submit"] {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+    background-color: #0056b3;
+}

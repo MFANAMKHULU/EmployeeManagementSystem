@@ -1,0 +1,20 @@
+## Steps to run the Website
+    0. Install django by "pip install django"
+        - Open cmd as an Administrator
+        - Run "python -m pip install --upgrade pip"
+        - Run "python -m pip install django"
+        - Verify installation by "django-admin --version"
+	- Install Django REST Framework by "pip install djangorestframework"
+	- Install gravatar by "pip install django-gravatar"
+
+    1. Go to the project folder "cd <name of project>" where there is "manage.py"
+    2. Run "py manage.py migrate" since django comes with deflaut tables
+    3. Create a superuser by "py manage.py createsuperuser"
+        - Username: 
+        -Email: 
+        - Password: 
+    4. Run the server by "py manage.py runserver"
+    5. Open the url "http://127.0.0.1:8000/"
+    6. To open the django admin page, use "http://127.0.0.1:8000/admin"
+
+    

@@ -1,0 +1,110 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/admin_homepage.css' %}">
+    <link rel="icon" href="{% static 'images/blue.jpg' %}" type="image/x-icon">
+    <title>Homepage</title>
+</head>
+<body class="homepage">
+
+    {% include 'navigation_bar.html' %}
+
+    <div class="content" style="text-align: center; color: #fff; padding: 30px;">
+        <h1 class="centered">Welcome to Administration</h1>
+        <p>This is the Blue Administration section for HR, Admin, and ICTS staff only.</p>
+        <p>In this site, admin staff can manage employee hierarchy with features for adding, updating, and deleting employee records.</p>
+    </div>
+
+    <div class="hierarchy-container" style="text-align: center;">
+        <div id="employee-tree" style="color: #fff;">
+            <h1>Organisation’s Hierarchy</h1>
+        </div>
+        <div style="margin-bottom: 10px;">
+            <button id="zoom-in">+</button>
+            <button id="zoom-out">-</button>
+        </div>
+    </div>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script>
+        function createTree(data) {
+            const margin = { top: 20, right: 200, bottom: 20, left: 200 };
+            const width = 960 - margin.left - margin.right;
+            const height = 500 - margin.top - margin.bottom;
+
+            const svg = d3.select("#employee-tree").append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+
+            const treeLayout = d3.tree().size([height, width]);
+
+            const root = d3.hierarchy(data);
+            treeLayout(root);
+
+            const link = svg.selectAll(".link")
+                .data(root.descendants().slice(1))
+                .enter().append("path")
+                .attr("class", "link")
+                .attr("d", d => {
+                    return `M${d.y},${d.x}
+                            C${(d.y + d.parent.y) / 2},${d.x}
+                             ${(d.y + d.parent.y) / 2},${d.parent.x}
+                             ${d.parent.y},${d.parent.x}`;
+                })
+                .style("fill", "none")
+                .style("stroke", "#ccc")
+                .style("stroke-width", "2px");
+
+            const node = svg.selectAll(".node")
+                .data(root.descendants())
+                .enter().append("g")
+                .attr("class", "node")
+                .attr("transform", d => `translate(${d.y},${d.x})`);
+
+            node.append("circle")
+                .attr("r", 10)
+                .style("fill", "#ec480f")
+                .style("stroke", "steelblue")
+                .style("stroke-width", "3px");
+
+            node.append("text")
+                .attr("dy", ".35em")
+                .attr("x", d => d.children ? -20 : 20)
+                .style("text-anchor", d => d.children ? "end" : "start")
+                .text(d => d.data.name)
+                .style("font", "bold 18px sans-serif")
+                .style("fill", "#fff");
+
+            const zoom = d3.zoom()
+                .scaleExtent([0.5, 2])
+                .on("zoom", (event) => {
+                    svg.attr("transform", event.transform);
+                });
+
+            svg.call(zoom);
+
+            document.getElementById('zoom-in').addEventListener('click', function () {
+                svg.transition().call(zoom.scaleBy, 1.2);
+            });
+
+            document.getElementById('zoom-out').addEventListener('click', function () {
+                svg.transition().call(zoom.scaleBy, 0.8);
+            });
+        }
+
+        // Fetch the hierarchical data from the server
+        fetch("{% url 'get_employee_hierarchy' %}")
+            .then(response => response.json())
+            .then(data => {
+                createTree(data);
+            })
+            .catch(error => console.error("Error fetching employee data:", error));
+    </script>
+</body>
+</html>

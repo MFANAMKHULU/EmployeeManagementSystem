@@ -1,0 +1,41 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/navigation_bar.css' %}">
+    <link rel="icon" href="{% static 'images/blue.jpg' %}" type="image/x-icon">
+</head>
+<body class="homepage">
+    <div class="topnav">
+        <div class="welcome-container">
+            <img class="logo" src="{% static 'images/blue.jpg' %}" alt="Logo">
+            
+            <span class="welcome-text">Welcome</span> 
+        </div>
+        <div class="topnav-right">
+            
+            <!-- <a href="#" class="subnavbtn">Log out</a> -->
+        </div>
+    </div>
+    
+    <div class="navbar">
+        <a href="{% url 'admin_homepage' %}">Home</a>
+    
+    
+        <!-- Participants -->
+        <div class="dropdown">
+            <button class="dropbtn">Employees <i class="fa fa-caret-down"></i></button>
+            <div class="dropdown-content">
+                <a href="{% url 'user_list' %}">View employees</a>
+                <a href="{% url 'user_registration' %}">Add employees</a>
+            </div>
+        </div>
+      
+        <a href="{% url 'resources' %}" target="_blank">Advanced Configurations</a>
+      </div>
+    </div>
+    </body>
+</html>
